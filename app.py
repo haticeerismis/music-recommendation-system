@@ -8,7 +8,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.neighbors import NearestNeighbors
+from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 load_dotenv()
 CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
@@ -57,8 +58,7 @@ discover_model.fit(X_train_dis, y_train_dis)
 X_knn = df.drop(columns=['mood', 'discoverable'])
 scaler_knn = StandardScaler()
 X_knn_scaled = scaler_knn.fit_transform(X_knn)
-knn_model = NearestNeighbors(n_neighbors=6)
-knn_model.fit(X_knn_scaled)
+similarity_matrix = cosine_similarity(X_knn_scaled)
 
 def get_spotify_token():
     auth_str = f"{CLIENT_ID}:{CLIENT_SECRET}"
@@ -83,7 +83,7 @@ def fetch_track_names(track_ids, token):
 @app.route('/')
 def index():
     token = get_spotify_token()
-    ids = track_info['id'].dropna().unique()[:20]
+    ids = track_info['id'].dropna().unique()[:80]
     song_list = fetch_track_names(ids, token)
     example_id = song_list[0]['id']
     return render_template('index.html', example_id=example_id, song_list=song_list)
@@ -91,7 +91,7 @@ def index():
 @app.route('/api/recommend')
 def api_recommend():
     r_type = request.args.get('type')
-    
+
     if r_type == 'mood':
         mood = request.args.get('value')
         result = df[df['mood'] == mood].sample(3)
@@ -107,9 +107,10 @@ def api_recommend():
         song_id = request.args.get('id')
         try:
             song_idx = track_info[track_info['id'] == song_id].index[0]
-            query = X_knn_scaled[song_idx].reshape(1, -1)
-            _, indices = knn_model.kneighbors(query)
-            links = [{'id': track_info.iloc[i]['id']} for i in indices[0][1:]]
+            similarity_scores = similarity_matrix[song_idx]
+            similar_indices = similarity_scores.argsort()[::-1][1:10]  # Kendisi hariç en benzerler
+            chosen = np.random.choice(similar_indices, size=3, replace=False)
+            links = [{'id': track_info.iloc[i]['id']} for i in chosen]
             return jsonify({'songs': links})
         except:
             return jsonify({'error': 'ID geçersiz veya şarkı bulunamadı'}), 400

@@ -4,18 +4,93 @@
     <meta charset="UTF-8">
     <title>Müzik Öneri Sistemi 🎵</title>
     <style>
-        body {
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden;
+            background: linear-gradient(-45deg, #5a4e7c, #2f2b41, #37474f, #1c1c1c, #2e3c43, #1f2933, #4a5568);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(to right, #1e3c72, #2a5298);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
             color: #fff;
             text-align: center;
             padding: 50px;
+            position: relative;
+            z-index: 1;
         }
+
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .wave {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background: url('https://svgshare.com/i/xh_.svg') repeat-x;
+            background-size: contain;
+            animation: waveAnim 10s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes waveAnim {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1000px; }
+        }
+
         h1 {
             font-size: 2em;
             margin-bottom: 40px;
+            z-index: 2;
+            position: relative;
         }
-        select, button {
+
+        .mood-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .mood-box {
+            background: rgba(0,0,0,0.3);
+            border: 2px solid #ffffff88;
+            border-radius: 15px;
+            padding: 20px 30px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .mood-box:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .mood-box:active {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        select, button, input {
             padding: 15px 25px;
             margin: 15px;
             font-size: 1em;
@@ -23,119 +98,164 @@
             border-radius: 10px;
             cursor: pointer;
             transition: 0.3s ease;
+            z-index: 2;
+            position: relative;
         }
-        select {
-            background-color: #ffffff10;
+
+        select, input {
+            background-color: #111;
             color: #fff;
         }
+
+        select option {
+            background-color: #2a5298;
+            color: #fff;
+        }
+
         button {
-            background-color: #ffffff20;
+            background-color: #333;
             color: #fff;
         }
+
         button:hover {
-            background-color: #ffffff40;
+            background-color: #555;
         }
+
         #recommendations {
             margin-top: 40px;
             font-size: 1.2em;
+            z-index: 2;
+            position: relative;
         }
+
         iframe {
             margin: 10px 0;
         }
-        select {
-    background-color: #ffffff10;
-    color: #fff;
-}
-
-select option {
-    background-color: #2a5298;
-    color: #fff;
-}
-
     </style>
 </head>
 <body>
+<div id="particles-js"></div>
+<div class="wave"></div>
 
-    <h1>Müzik Öneri Sistemi 🎵</h1>
+<h1>Müzik Öneri Sistemi 🎵</h1>
 
-    <div>
-        <label for="moodSelect">Mood Seç:</label>
-        <select id="moodSelect">
-            <option value="happy">Mutlu</option>
-            <option value="sad">Üzgün</option>
-            <option value="energetic">Enerjik</option>
-            <option value="calm">Sakin</option>
-        </select>
+<div class="mood-grid">
+    <button class="mood-box" onclick="getMoodRecommendations('happy')">😊 Mutlu</button>
+    <button class="mood-box" onclick="getMoodRecommendations('sad')">😢 Üzgün</button>
+    <button class="mood-box" onclick="getMoodRecommendations('energetic')">⚡ Enerjik</button>
+    <button class="mood-box" onclick="getMoodRecommendations('calm')">🌙 Sakin</button>
+</div>
 
-        <button onclick="getMoodRecommendations()">Moda Göre Öner</button>
-        <button onclick="discoverMusic()">Yeni Şeyler Keşfet</button>
-    </div>
+<div>
+    <button onclick="discoverMusic()">🎲 Yeni Şeyler Keşfet</button>
+</div>
 
-    <div>
-        <label for="songSelect">Şarkı Seç (Benzer öneri için):</label>
-        <select id="songSelect">
-            {% for song in song_list %}
-                <option value="{{ song.id }}">{{ song.name }}</option>
-            {% endfor %}
-        </select>
+<div style="margin-top: 30px">
+    <input type="text" id="searchInput" placeholder="Şarkı ara...">
+    <button onclick="searchSong()">Ara</button>
+    <select id="searchResults" style="display:none;" onchange="enableRecommendBtn(this)"></select>
+    <button id="similarSearchBtn" style="display:none;" onclick="recommendBasedOnSearch()">Benzerlerini Öner</button>
+</div>
 
-        <button onclick="recommendBasedOnSelected()">Benzer Şarkı Öner</button>
-    </div>
+<!-- Gizli select: Arama filtrelemesi için -->
+<select id="songSelect" style="display:none;">
+    {% for song in song_list %}
+        <option value="{{ song.id }}">{{ song.name }}</option>
+    {% endfor %}
+</select>
 
-    <div id="recommendations"></div>
+<div id="recommendations"></div>
 
-    <script>
-        function getMoodRecommendations() {
-            const mood = document.getElementById('moodSelect').value;
-
-            fetch(`/api/recommend?type=mood&value=${mood}`)
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("recommendations");
-                    container.innerHTML = `<h3>🎵 Moda Göre Önerilen Şarkılar:</h3>`;
-                    data.songs.forEach(song => {
-                        container.innerHTML += `
-                            <iframe src="https://open.spotify.com/embed/track/${song.id}"
-                                    width="300" height="80" frameborder="0"
-                                    allowtransparency="true" allow="encrypted-media">
-                            </iframe>`;
-                    });
+<script>
+    function getMoodRecommendations(mood) {
+        fetch(`/api/recommend?type=mood&value=${mood}`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById("recommendations");
+                container.innerHTML = `<h3>🎵 Moda Göre Önerilen Şarkılar (${mood}):</h3>`;
+                data.songs.forEach(song => {
+                    container.innerHTML += `
+                        <iframe src="https://open.spotify.com/embed/track/${song.id}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
                 });
+            });
+    }
+
+    function discoverMusic() {
+        fetch(`/api/recommend?type=discover`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById("recommendations");
+                container.innerHTML = `<h3>✨ Keşfedilecek Şarkılar:</h3>`;
+                data.songs.forEach(song => {
+                    container.innerHTML += `
+                        <iframe src="https://open.spotify.com/embed/track/${song.id}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+                });
+            });
+    }
+
+    function searchSong() {
+        const query = document.getElementById('searchInput').value.toLowerCase();
+        const allOptions = [...document.querySelectorAll("#songSelect option")];
+
+        const filtered = allOptions.filter(option => option.textContent.toLowerCase().includes(query));
+        const searchResults = document.getElementById("searchResults");
+        const btn = document.getElementById("similarSearchBtn");
+
+        searchResults.innerHTML = "";
+        if (filtered.length === 0) {
+            searchResults.style.display = "none";
+            btn.style.display = "none";
+            alert("Şarkı bulunamadı!");
+            return;
         }
 
-        function discoverMusic() {
-            fetch(`/api/recommend?type=discover`)
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("recommendations");
-                    container.innerHTML = `<h3>✨ Keşfedilecek Şarkılar:</h3>`;
-                    data.songs.forEach(song => {
-                        container.innerHTML += `
-                            <iframe src="https://open.spotify.com/embed/track/${song.id}"
-                                    width="300" height="80" frameborder="0"
-                                    allowtransparency="true" allow="encrypted-media">
-                            </iframe>`;
-                    });
-                });
-        }
+        filtered.forEach(opt => {
+            const clone = opt.cloneNode(true);
+            searchResults.appendChild(clone);
+        });
 
-        function recommendBasedOnSelected() {
-            const selectedId = document.getElementById('songSelect').value;
-            fetch(`/api/recommend?type=similar&id=${selectedId}`)
-                .then(response => response.json())
-                .then(data => {
-                    const container = document.getElementById("recommendations");
-                    container.innerHTML = `<h3>🔁 Seçilen Şarkıya Benzer Öneriler:</h3>`;
-                    data.songs.forEach(song => {
-                        container.innerHTML += `
-                            <iframe src="https://open.spotify.com/embed/track/${song.id}"
-                                    width="300" height="80" frameborder="0"
-                                    allowtransparency="true" allow="encrypted-media">
-                            </iframe>`;
-                    });
-                });
+        searchResults.style.display = "inline-block";
+        btn.style.display = "inline-block";
+    }
+
+    function enableRecommendBtn(selectEl) {
+        const btn = document.getElementById("similarSearchBtn");
+        btn.disabled = !selectEl.value;
+    }
+
+    function recommendBasedOnSearch() {
+        const selectedId = document.getElementById('searchResults').value;
+        if (!selectedId) {
+            alert("Lütfen önce bir şarkı seçin.");
+            return;
         }
-    </script>
+        fetch(`/api/recommend?type=similar&id=${selectedId}`)
+            .then(response => response.json())
+            .then(data => {
+                const container = document.getElementById("recommendations");
+                container.innerHTML = `<h3>🔎 Aranan Şarkıya Benzer Öneriler:</h3>`;
+                data.songs.forEach(song => {
+                    container.innerHTML += `
+                        <iframe src="https://open.spotify.com/embed/track/${song.id}" width="300" height="80" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>`;
+                });
+            });
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+  particlesJS("particles-js", {
+    "particles": {
+      "number": {"value": 60, "density": {"enable": true, "value_area": 800}},
+      "color": {"value": "#ffffff"},
+      "shape": {"type": "circle"},
+      "opacity": {"value": 0.5},
+      "size": {"value": 3},
+      "line_linked": {"enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1},
+      "move": {"enable": true, "speed": 2}
+    }
+  });
+</script>
 
 </body>
 </html>
