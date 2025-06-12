@@ -6,11 +6,11 @@ Bu proje, kullanıcıların ruh haline (mood), keşfetme isteğine ya da seçti�
 
 🚀 Özellikler
 
-  🎧 **Moda Göre Öneri**: Mutlu, üzgün, enerjik veya sakin hissettiğinize göre şarkılar önerilir.
-  🔁 **Benzer Şarkı Önerisi**: Seçtiğiniz bir şarkıya en çok benzeyen 5 farklı parça önerilir.
-  ✨ **Keşfetme Modu**: Enerjik ve dans edilebilir şarkılardan rastgele öneriler yapılır.
-  📺 **Spotify Player Desteği**: Önerilen şarkılar embed player ile sayfa üzerinde dinlenebilir.
-  🔍 **Dropdown Menü ile Arama**: Şarkılar isimleriyle listelenir, kullanıcı istediği parçayı kolayca seçebilir.
+🎧 **Moda Göre Öneri**: Mutlu, üzgün, enerjik veya sakin hissettiğinize göre şarkılar önerilir.
+🔁 **Benzer Şarkı Önerisi**: Seçtiğiniz bir şarkıya en çok benzeyen 5 farklı parça önerilir.
+✨ **Keşfetme Modu**: Enerjik ve dans edilebilir şarkılardan rastgele öneriler yapılır.
+📺 **Spotify Player Desteği**: Önerilen şarkılar embed player ile sayfa üzerinde dinlenebilir.
+🔍 **Dropdown Menü ile Arama**: Şarkılar isimleriyle listelenir, kullanıcı istediği parçayı kolayca seçebilir.
 
 ---
 
@@ -38,3 +38,4 @@ SPOTIFY_CLIENT_SECRET=xxx
 python app.py
 
 
+```
