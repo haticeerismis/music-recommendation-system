@@ -1,4 +1,9 @@
 🎵 Müzik Öneri Sistemi
+ARAYÜZ 
+![image](https://github.com/user-attachments/assets/3fc5774a-9034-468d-8e5e-70347bd6d96e)
+![image](https://github.com/user-attachments/assets/c60d413f-a6a2-4cc2-ad63-798af1347b29)
+![image](https://github.com/user-attachments/assets/85070e55-9eff-4320-9687-98d1a9c30dd2)
+![image](https://github.com/user-attachments/assets/57b37c81-88aa-4700-b78c-582be386e6ba)
 
 Bu proje, kullanıcıların ruh haline (mood), keşfetme isteğine ya da seçtiği bir şarkıya göre benzer parçalarla öneri almasını sağlayan bir müzik öneri sistemidir. Flask ile geliştirilmiş backend yapısı, kullanıcı dostu bir web arayüzü ile desteklenmiştir.
 
@@ -27,6 +32,7 @@ Bu proje, kullanıcıların ruh haline (mood), keşfetme isteğine ya da seçti�
 ## 💾 Kurulum
 
 > Projeyi kendi bilgisayarınızda çalıştırmak için:
+> DataSet proje ana dizinine eklenmeli. Veriseti Link: https://drive.google.com/drive/folders/1y7OTYaZLMF7FoCTvvRHSm2O5C-p7_yPj?usp=sharing
 
 ```bash
 git clone https://github.com/haticeerismis/Muzik-Oneri-Sistemi.git
